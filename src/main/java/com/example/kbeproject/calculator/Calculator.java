@@ -1,11 +1,11 @@
 package com.example.kbeproject.calculator;
 
 public class Calculator {
-    private double price;
-    private double mwSt;
+    private Double price;
+    private Double mwSt;
 
 
-    public Calculator(double price, double mwSt) {
+    public Calculator(Double price, Double mwSt) {
         this.price = price;
         this.mwSt = mwSt;
     }
@@ -14,19 +14,19 @@ public class Calculator {
         return price + price * mwSt;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public double getMwSt() {
+    public Double getMwSt() {
         return mwSt;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public void setMwSt(double mwSt) {
+    public void setMwSt(Double mwSt) {
         this.mwSt = mwSt;
     }
 
