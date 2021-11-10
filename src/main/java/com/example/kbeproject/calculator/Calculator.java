@@ -10,8 +10,13 @@ public class Calculator {
         this.mwSt = mwSt;
     }
 
+    public double calculateMwSt(){
+        return price * mwSt;
+    }
+
+    //TODO do we need this?
     public double calculateEndprice() {
-        return price + price * mwSt;
+        return price + calculateMwSt();
     }
 
     public Double getPrice() {
