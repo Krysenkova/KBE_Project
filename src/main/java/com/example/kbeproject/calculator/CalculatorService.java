@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 public class CalculatorService {
     private Calculator calc;
 
-    public Double calculateMwSt(Double price, Double mwSt) {
-        calc = new Calculator(price, mwSt);
-        return calc.calculateMwSt();
+    public Double calculateMwSt(Double price) {
+        calc = new Calculator();
+        return calc.calculateMwSt(price);
     }
 }

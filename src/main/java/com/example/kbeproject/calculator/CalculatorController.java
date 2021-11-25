@@ -16,7 +16,7 @@ public class CalculatorController {
     }
 
     @GetMapping
-    public double calculateMwSt(Double price, Double mwSt){
-        return calcServ.calculateMwSt(price, mwSt);
+    public double calculateMwSt(Double price){
+        return calcServ.calculateMwSt(price);
     }
 }
