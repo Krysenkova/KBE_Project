@@ -1,15 +1,33 @@
 package com.example.kbeproject.product;
 
+import com.example.kbeproject.valueObjects.ResponseList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 @Component
 public class ProductService {
 
-    //for now some hardcoded products - later data from database
+    private final ProductRepository productRepository;
+
+    private RestTemplate restTemplate;
+
+    @Autowired
+    public ProductService(ProductRepository productRepository, RestTemplate restTemplate) {
+        this.productRepository = productRepository;
+        this.restTemplate = restTemplate;
+    }
+
     public List<Product> getProducts() {
-        return List.of(new Product("Christmas tree", "Nice christmas tree for nice holiday mood", "wood", "brown and green", "10 kg.", 48 * 3600000L, 50.0),
-                        new Product("Set of candles", "3 candles with apple and cinnamon aroma", "wax", "beige", "0.2 kg.", 24 * 3600000L, 10.0));
+        return productRepository.findAll();
+    }
+
+    public ResponseList sendProducts(List<Product> products) {
+        System.out.println("products: " + products);
+        ResponseList productList = restTemplate.postForObject("http://localhost:8081/api/vat",
+                products, ResponseList.class);
+        return productList;
     }
 }

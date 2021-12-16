@@ -1,14 +1,17 @@
 package com.example.kbeproject.product;
+
+import com.example.kbeproject.valueObjects.ResponseList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/products")
 public class ProductController {
+    Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     private final ProductService productService;
 
@@ -19,6 +22,12 @@ public class ProductController {
 
     @GetMapping
     public List<Product> getProducts() {
+        logger.trace("Getting Products in ProductController");
         return productService.getProducts();
+    }
+
+    @PostMapping("/list")
+    public ResponseList sendProducts(@RequestBody List<Product> products){
+       return productService.sendProducts(products);
     }
 }
