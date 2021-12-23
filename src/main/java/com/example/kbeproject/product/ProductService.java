@@ -1,5 +1,7 @@
 package com.example.kbeproject.product;
 
+import com.example.kbeproject.valueObjects.DeliveryInfoList;
+import com.example.kbeproject.valueObjects.Storage;
 import com.example.kbeproject.valueObjects.ResponseList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,5 +31,15 @@ public class ProductService {
         ResponseList productList = restTemplate.postForObject("http://localhost:8081/api/vat",
                 products, ResponseList.class);
         return productList;
+    }
+
+    public DeliveryInfoList getDeliveryInfo(){
+        return restTemplate.getForObject("http://localhost:8082/api/storage/all", DeliveryInfoList.class);
+    }
+    public Storage getDeliveryInfoById(Long productId) {
+        String url = "http://localhost:8082/api/storage/" + productId;
+        System.out.println("url: " + url);
+        Storage info = restTemplate.getForObject(url, Storage.class);
+        return info;
     }
 }
