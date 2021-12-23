@@ -1,5 +1,6 @@
 package com.example.kbeproject.product;
 
+import com.example.kbeproject.valueObjects.Storage;
 import com.example.kbeproject.valueObjects.ResponseList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,5 +30,10 @@ public class ProductController {
     @PostMapping("/list")
     public ResponseList sendProducts(@RequestBody List<Product> products){
        return productService.sendProducts(products);
+    }
+
+    @GetMapping("/delivery_info/{id}")
+    public Storage getDeliveryInfoById(@PathVariable("id") Long productId){
+        return productService.getDeliveryInfoById(productId);
     }
 }
