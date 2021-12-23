@@ -27,8 +27,6 @@ public class Product {
     private String colour;
     @Column(name = "weight")
     private String weight;
-    @Column(name = "time_of_delivery")
-    private Long timeOfDelivery;
     @Column(name = "price_without_vat")
     private Double priceWithoutVat;
     @Transient
@@ -40,14 +38,13 @@ public class Product {
     /**
      * constructor without id
      */
-    public Product(Long itemId, String name, String description, String material, String colour, String weight, Long timeOfDelivery, Double priceWithoutVat, Double priceWithVat) {
+    public Product(Long itemId, String name, String description, String material, String colour, String weight, Double priceWithoutVat, Double priceWithVat) {
         this.itemId = itemId;
         this.name = name;
         this.description = description;
         this.material = material;
         this.colour = colour;
         this.weight = weight;
-        this.timeOfDelivery = timeOfDelivery;
         this.priceWithoutVat = priceWithoutVat;
         this.priceWithVat = priceWithVat;
     }

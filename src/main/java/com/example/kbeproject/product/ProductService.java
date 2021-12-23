@@ -10,12 +10,12 @@ import java.util.List;
 @Component
 public class ProductService {
 
-    private final ProductRepository productRepository;
+    private final P_Repository productRepository;
 
     private RestTemplate restTemplate;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, RestTemplate restTemplate) {
+    public ProductService(P_Repository productRepository, RestTemplate restTemplate) {
         this.productRepository = productRepository;
         this.restTemplate = restTemplate;
     }
