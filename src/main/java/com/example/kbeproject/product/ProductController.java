@@ -1,8 +1,8 @@
 package com.example.kbeproject.product;
 
-import com.example.kbeproject.valueObjects.DeliveryInfoList;
-import com.example.kbeproject.valueObjects.Storage;
-import com.example.kbeproject.valueObjects.ResponseList;
+import com.example.kbeproject.models.DeliveryInfoList;
+import com.example.kbeproject.models.Storage;
+import com.example.kbeproject.models.ResponseList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class ProductController {
     }
 
 
-    @GetMapping("delivery_info")
+    @GetMapping("/delivery_info")
     public DeliveryInfoList getDeliveryInfo(){
        return productService.getDeliveryInfo();
     }

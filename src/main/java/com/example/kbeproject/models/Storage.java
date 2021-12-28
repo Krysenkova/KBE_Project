@@ -1,4 +1,4 @@
-package com.example.kbeproject.valueObjects;
+package com.example.kbeproject.models;
 
 import lombok.Getter;
 import lombok.Setter;
