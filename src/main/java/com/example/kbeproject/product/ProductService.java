@@ -5,8 +5,10 @@ import com.example.kbeproject.models.Storage;
 import com.example.kbeproject.models.ResponseList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Component
