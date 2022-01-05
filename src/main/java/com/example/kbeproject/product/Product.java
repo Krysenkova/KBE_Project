@@ -31,6 +31,8 @@ public class Product {
     private Double priceWithoutVat;
     @Transient
     private Double priceWithVat;
+    @Transient
+    private String formattedAddress;
 
     public Product() {
     }

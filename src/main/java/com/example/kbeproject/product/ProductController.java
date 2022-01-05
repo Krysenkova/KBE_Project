@@ -62,7 +62,7 @@ public class ProductController {
                 if (item.getItemId().equals(stor.getItemId())) {
                     ProductAllInfo p = new ProductAllInfo(item.getItemId(), item.getName(), item.getDescription(), item.getMaterial(),
                             item.getColour(), item.getWeight(), item.getPriceWithoutVat(), item.getPriceWithVat(),
-                            stor.getDeliveryTime(), stor.getAmount(), stor.getLocation());
+                            stor.getDeliveryTime(), stor.getAmount(), stor.getLocation(), item.getFormattedAddress());
                     allInfo.getAllInfoList().add(p);
                 }
             }
@@ -82,4 +82,6 @@ public class ProductController {
         }
         csvWriter.close();
     }
+
+
 }

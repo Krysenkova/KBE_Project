@@ -22,13 +22,16 @@ public class ProductAllInfo {
     private Integer amount;
     private String location;
 
+    private String formattedAddress;
+
     //TODO: Info von External API
 
     public ProductAllInfo() {
     }
 
     public ProductAllInfo(Long itemId, String name, String description, String material, String colour, String weight,
-                          Double priceWithoutVat, Double priceWithVat, Long deliveryTime, Integer amount, String location) {
+                          Double priceWithoutVat, Double priceWithVat, Long deliveryTime, Integer amount, String location,
+                          String formattedAddress) {
         this.itemId = itemId;
         this.name = name;
         this.description = description;
@@ -40,5 +43,6 @@ public class ProductAllInfo {
         this.deliveryTime = deliveryTime;
         this.amount = amount;
         this.location = location;
+        this.formattedAddress = formattedAddress;
     }
 }

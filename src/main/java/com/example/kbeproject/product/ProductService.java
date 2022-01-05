@@ -42,4 +42,6 @@ public class ProductService {
         Storage info = restTemplate.getForObject(url, Storage.class);
         return info;
     }
+
+
 }
