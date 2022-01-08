@@ -3,6 +3,7 @@ package com.example.kbeproject.product;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.cache.annotation.CacheConfig;
 
 import javax.persistence.*;
 
