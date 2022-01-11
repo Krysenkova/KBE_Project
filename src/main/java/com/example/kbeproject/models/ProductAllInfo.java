@@ -1,5 +1,6 @@
 package com.example.kbeproject.models;
 
+import com.opencsv.bean.CsvBindByName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -8,18 +9,27 @@ import lombok.ToString;
 @Getter @Setter
 @ToString
 public class ProductAllInfo {
-
+    @CsvBindByName
     private Long itemId;
+    @CsvBindByName
     private String name;
+    @CsvBindByName
     private String description;
+    @CsvBindByName
     private String material;
+    @CsvBindByName
     private String colour;
+    @CsvBindByName
     private String weight;
+    @CsvBindByName
     private Double priceWithoutVat;
+    @CsvBindByName
     private Double priceWithVat;
-
+    @CsvBindByName
     private Long deliveryTime;
+    @CsvBindByName
     private Integer amount;
+    @CsvBindByName
     private String location;
 
     //TODO: Info von External API
