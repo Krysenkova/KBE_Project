@@ -31,6 +31,8 @@ public class Product {
     private Double priceWithoutVat;
     @Transient
     private Double priceWithVat;
+    @Transient
+    private String formattedAddress;
 
     public Product() {
     }
@@ -38,7 +40,7 @@ public class Product {
     /**
      * constructor without id
      */
-    public Product(Long itemId, String name, String description, String material, String colour, String weight, Double priceWithoutVat, Double priceWithVat) {
+    public Product(Long itemId, String name, String description, String material, String colour, String weight, Double priceWithoutVat, Double priceWithVat, String formattedAddress) {
         this.itemId = itemId;
         this.name = name;
         this.description = description;
@@ -47,5 +49,6 @@ public class Product {
         this.weight = weight;
         this.priceWithoutVat = priceWithoutVat;
         this.priceWithVat = priceWithVat;
+        this.formattedAddress = formattedAddress;
     }
 }
