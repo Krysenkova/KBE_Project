@@ -2,6 +2,7 @@ package com.example.kbeproject.product;
 
 import com.example.kbeproject.models.*;
 import com.example.kbeproject.utils.CsvWriter;
+import com.example.kbeproject.upload.FileTransferServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,11 @@ public class ProductController {
     Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     private final ProductService productService;
-
+    private final FileTransferServiceImpl transfer;
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, FileTransferServiceImpl transfer) {
         this.productService = productService;
+        this.transfer = transfer;
     }
 
     @GetMapping
@@ -34,7 +36,7 @@ public class ProductController {
     public ResponseList sendProducts(@RequestBody List<Product> products) {
         return productService.sendProducts(products);
     }
-    
+
     @GetMapping("/delivery_info")
     public DeliveryInfoList getDeliveryInfo() {
         return productService.getDeliveryInfo();
@@ -64,5 +66,7 @@ public class ProductController {
 
         }
         writer.writeToCsvFile(stringList, new File("all_info.csv"));
+        transfer.uploadFile("all_info.csv", "all_info.csv");
+        productService.triggerDownload();
     }
 }
