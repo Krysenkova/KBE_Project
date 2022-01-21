@@ -1,8 +1,7 @@
 package com.example.kbeproject.product;
 
 import com.example.kbeproject.models.*;
-import com.example.kbeproject.product.CsvWriter;
-
+import com.example.kbeproject.utils.CsvWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,25 +35,20 @@ public class ProductController {
         return productService.sendProducts(products);
     }
 
-
     @GetMapping("/delivery_info")
-    public DeliveryInfoList getDeliveryInfo() {
-        return productService.getDeliveryInfo();
+    public DeliveryInfoList getDeliveryInfo() throws IOException {
+        DeliveryInfoList list = productService.getDeliveryInfo();
+        for(Storage item: list.getStorageList()){
+            item.setLocation(productService.getFormattedAddress(item));
+        }
+        return list;
     }
 
     @GetMapping("/delivery_info/{id}")
-    public Storage getDeliveryInfoById(@PathVariable("id") Long productId) {
-        return productService.getDeliveryInfoById(productId);
-    }
-
-    @GetMapping("/formatted_address")
-    public void getFormattedAddress() {
-        List<Storage> list = productService.getDeliveryInfo().getStorageList();
-        try {
-            productService.getGeocode(new DeliveryInfoList(list));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public Storage getDeliveryInfoById(@PathVariable("id") Long productId) throws IOException {
+        Storage storage = productService.getDeliveryInfoById(productId);
+        storage.setLocation(productService.getFormattedAddress(storage));
+        return storage;
     }
 
     @GetMapping("/export")

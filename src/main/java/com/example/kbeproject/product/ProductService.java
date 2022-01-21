@@ -1,29 +1,19 @@
 package com.example.kbeproject.product;
 
-import com.example.kbeproject.geocode.GeocodeController;
-import com.example.kbeproject.geocode.GeocodeObject;
 import com.example.kbeproject.geocode.GeocodeResult;
-import com.example.kbeproject.geocode.GeocodeService;
 import com.example.kbeproject.models.DeliveryInfoList;
 import com.example.kbeproject.models.Storage;
 import com.example.kbeproject.models.ResponseList;
-import com.example.kbeproject.models.StringList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -59,17 +49,20 @@ public class ProductService {
         return info;
     }
 
-    public void getGeocode(DeliveryInfoList storageList) throws IOException {
-        StringList formattedAddresses = restTemplate.postForObject("http://localhost:8080/api/geocode/addresse", storageList, StringList.class);
-        if (formattedAddresses != null) {
-            for (int i = 0; i < formattedAddresses.getStringList().size(); i++) {
-                storageList.getStorageList().get(i).setLocation(formattedAddresses.getStringList().get(i));
-            }
-        }
-        System.out.println(formattedAddresses);
+    public String getFormattedAddress(Storage item) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        String encodedAddress = URLEncoder.encode(item.getLocation(), "UTF-8");
+        Request request = new Request.Builder()
+                .url("https://google-maps-geocoding.p.rapidapi.com/geocode/json?language=en&address=" + encodedAddress)
+                .get()
+                .addHeader("x-rapidapi-host", "google-maps-geocoding.p.rapidapi.com")
+                .addHeader("x-rapidapi-key", "1ae759c287msh779edf5552fed3bp1347bajsn63a12ee2cfe9"/*  Use your API Key here */)
+                .build();
+        ResponseBody responseBody = client.newCall(request).execute().body();
+        ObjectMapper objectMapper = new ObjectMapper();
+        GeocodeResult result = objectMapper.readValue(responseBody.string(), GeocodeResult.class);
+        return result.getResults().get(0).getFormattedAddress();
     }
-
-
 }
 
 

@@ -31,8 +31,6 @@ public class Product {
     private Double priceWithoutVat;
     @Transient
     private Double priceWithVat;
-    @Transient
-    private String formattedAddress;
 
     public Product() {
     }
@@ -49,6 +47,5 @@ public class Product {
         this.weight = weight;
         this.priceWithoutVat = priceWithoutVat;
         this.priceWithVat = priceWithVat;
-        this.formattedAddress = formattedAddress;
     }
 }
