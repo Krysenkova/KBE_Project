@@ -7,7 +7,6 @@ import lombok.ToString;
 
 
 @Getter @Setter
-@ToString
 public class ProductAllInfo {
     @CsvBindByName
     private Long itemId;
@@ -50,5 +49,15 @@ public class ProductAllInfo {
         this.deliveryTime = deliveryTime;
         this.amount = amount;
         this.location = location;
+    }
+
+    @Override
+    public String toString() {
+        return itemId + "; " + name + "; " +
+                description + "; " + material + "; "
+                + colour + "; " + weight + "; " +
+                + priceWithoutVat + "; " + priceWithVat + "; "
+                + deliveryTime + "; "  + amount + "; "
+                + location;
     }
 }
