@@ -53,11 +53,11 @@ public class ProductAllInfo {
 
     @Override
     public String toString() {
-        return itemId + ", " + name + ", " +
-                description + ", " + material + ", "
-                + colour + ", " + weight + ", " +
-                + priceWithoutVat + ", " + priceWithVat + ", "
-                + deliveryTime + ", "  + amount + ", "
+        return itemId + "; " + name + "; " +
+                description + "; " + material + "; "
+                + colour + "; " + weight + "; " +
+                + priceWithoutVat + "; " + priceWithVat + "; "
+                + deliveryTime + "; "  + amount + "; "
                 + location;
     }
 }
