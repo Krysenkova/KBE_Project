@@ -20,6 +20,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final FileTransferServiceImpl transfer;
+
     @Autowired
     public ProductController(ProductService productService, FileTransferServiceImpl transfer) {
         this.productService = productService;
@@ -32,15 +33,15 @@ public class ProductController {
         return productService.getProducts();
     }
 
-    @PostMapping("/list")
-    public ResponseList sendProducts(@RequestBody List<Product> products) {
-        return productService.sendProducts(products);
+    @PostMapping("/prices")
+    public PriceList getPriceWithMwSt(@RequestBody List<Price> prices) {
+        return productService.sendForPriceWithMwSt(prices);
     }
 
     @GetMapping("/delivery_info")
     public DeliveryInfoList getDeliveryInfo() throws IOException {
         DeliveryInfoList list = productService.getDeliveryInfo();
-        for(Storage item: list.getStorageList()){
+        for (Storage item : list.getStorageList()) {
             item.setLocation(productService.getFormattedAddress(item));
         }
         return list;
@@ -57,19 +58,24 @@ public class ProductController {
     public void exportToCSV() throws IOException {
         CsvWriter writer = new CsvWriter();
         List<Product> l = productService.getProducts();
-        ResponseList rl = productService.sendProducts(l);
-        DeliveryInfoList dil = productService.getDeliveryInfo();
+        List<Price> p = new ArrayList<>();
+        for (Product item : l) {
+            p.add(new Price(item.getItemId(), item.getPriceWithoutVat()));
+        }
+        List<Price> prices = productService.sendForPriceWithMwSt(p).getPriceList();
+        List<Storage> storage = productService.getDeliveryInfo().getStorageList();
         List<String> stringList = new ArrayList<>();
-        for (Product item : rl.getProductList()) {
-            for (Storage storage : dil.getStorageList()) {
-                if (item.getItemId().equals(storage.getItemId())) {
-                    ProductAllInfo p = new ProductAllInfo(item.getItemId(), item.getName(), item.getDescription(), item.getMaterial(),
-                            item.getColour(), item.getWeight(), item.getPriceWithoutVat(), item.getPriceWithVat(),
-                            storage.getDeliveryTime(), storage.getAmount(), storage.getLocation());
-                    stringList.add(p.toString());
+        int index = 0;
+        for (Product item : l) {
+            for (Storage s : storage) {
+                if (item.getItemId().equals(s.getItemId())) {
+                    ProductAllInfo allInfo = new ProductAllInfo(item.getItemId(), item.getName(), item.getDescription(), item.getMaterial(),
+                            item.getColour(), item.getWeight(), item.getPriceWithoutVat(), prices.get(index).getPrice(),
+                            s.getDeliveryTime(), s.getAmount(), s.getLocation());
+                    stringList.add(allInfo.toString());
                 }
             }
-
+            index++;
         }
         writer.writeToCsvFile(stringList, new File("all_info.csv"));
         transfer.uploadFile("all_info.csv", "all_info.csv");

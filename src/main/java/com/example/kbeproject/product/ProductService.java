@@ -2,8 +2,9 @@ package com.example.kbeproject.product;
 
 import com.example.kbeproject.geocode.GeocodeResult;
 import com.example.kbeproject.models.DeliveryInfoList;
+import com.example.kbeproject.models.Price;
 import com.example.kbeproject.models.Storage;
-import com.example.kbeproject.models.ResponseList;
+import com.example.kbeproject.models.PriceList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,10 +34,10 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public ResponseList sendProducts(List<Product> products) {
-        ResponseList productList = restTemplate.postForObject("http://localhost:8081/api/vat",
-                products, ResponseList.class);
-        return productList;
+    public PriceList sendForPriceWithMwSt(List<Price> prices) {
+        PriceList pricesList = restTemplate.postForObject("http://localhost:8081/api/mwst",
+                prices, PriceList.class);
+        return pricesList;
     }
 
     public DeliveryInfoList getDeliveryInfo(){
