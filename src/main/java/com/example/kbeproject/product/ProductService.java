@@ -34,7 +34,7 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public PriceList sendForPriceWithMwSt(List<Price> prices) {
+    public PriceList getPriceWithMwSt(List<Price> prices) {
         PriceList pricesList = restTemplate.postForObject("http://localhost:8081/api/mwst",
                 prices, PriceList.class);
         return pricesList;

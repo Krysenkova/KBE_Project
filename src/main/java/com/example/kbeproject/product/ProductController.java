@@ -29,17 +29,19 @@ public class ProductController {
 
     @GetMapping
     public List<Product> getProducts() {
-        logger.trace("Getting Products in ProductController");
+        logger.info("Getting Products");
         return productService.getProducts();
     }
 
     @PostMapping("/prices")
     public PriceList getPriceWithMwSt(@RequestBody List<Price> prices) {
-        return productService.sendForPriceWithMwSt(prices);
+        logger.info("Getting price with Mehrwertsteuerr");
+        return productService.getPriceWithMwSt(prices);
     }
 
     @GetMapping("/delivery_info")
     public DeliveryInfoList getDeliveryInfo() throws IOException {
+        logger.info("Getting Info from Storage");
         DeliveryInfoList list = productService.getDeliveryInfo();
         for (Storage item : list.getStorageList()) {
             item.setLocation(productService.getFormattedAddress(item));
@@ -49,24 +51,32 @@ public class ProductController {
 
     @GetMapping("/delivery_info/{id}")
     public Storage getDeliveryInfoById(@PathVariable("id") Long productId) throws IOException {
+        logger.info("Getting Info from Storage for product with id " + productId);
         Storage storage = productService.getDeliveryInfoById(productId);
         storage.setLocation(productService.getFormattedAddress(storage));
         return storage;
     }
 
     @GetMapping("/export")
-    public void exportToCSV() throws IOException {
-        CsvWriter writer = new CsvWriter();
-        List<Product> l = productService.getProducts();
-        List<Price> p = new ArrayList<>();
-        for (Product item : l) {
-            p.add(new Price(item.getItemId(), item.getPriceWithoutVat()));
+    public void exportData() throws IOException {
+        logger.info("Start exporting products info");
+        List<Product> products = productService.getProducts();
+        List<Price> pricesWithoutMwSt = new ArrayList<>();
+        for (Product item : products) {
+            pricesWithoutMwSt.add(new Price(item.getItemId(), item.getPriceWithoutVat()));
         }
-        List<Price> prices = productService.sendForPriceWithMwSt(p).getPriceList();
+        List<Price> pricesWithMwSt = productService.getPriceWithMwSt(pricesWithoutMwSt).getPriceList();
         List<Storage> storage = getDeliveryInfo().getStorageList();
+        List<String> stringList = prepareDataForCSV(products, pricesWithMwSt, storage);
+        writeDataToCSV(stringList);
+        uploadFileToSftpServer();
+        productService.triggerDownload();
+    }
+
+    private List<String> prepareDataForCSV(List<Product> products, List<Price> prices, List<Storage> storage) {
         List<String> stringList = new ArrayList<>();
         int index = 0;
-        for (Product item : l) {
+        for (Product item : products) {
             for (Storage s : storage) {
                 if (item.getItemId().equals(s.getItemId())) {
                     ProductAllInfo allInfo = new ProductAllInfo(item.getItemId(), item.getName(), item.getDescription(), item.getMaterial(),
@@ -77,8 +87,20 @@ public class ProductController {
             }
             index++;
         }
+        logger.info("Data is prepared to be written to CSV file");
+        return stringList;
+    }
+
+    private void writeDataToCSV(List<String> stringList) throws IOException {
+        logger.info("Writing data to CSV file");
+        CsvWriter writer = new CsvWriter();
         writer.writeToCsvFile(stringList, new File("all_info.csv"));
-        transfer.uploadFile("all_info.csv", "all_info.csv");
-        productService.triggerDownload();
+    }
+
+    private void uploadFileToSftpServer() {
+        if (transfer.uploadFile("all_info.csv", "all_info.csv")) {
+            logger.info("File is uploaded to sftp server successfully");
+        }
+        else logger.error("The problem occurred while uploading file to sftp server");
     }
 }
