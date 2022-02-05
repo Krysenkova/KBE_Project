@@ -63,7 +63,7 @@ public class ProductController {
             p.add(new Price(item.getItemId(), item.getPriceWithoutVat()));
         }
         List<Price> prices = productService.sendForPriceWithMwSt(p).getPriceList();
-        List<Storage> storage = productService.getDeliveryInfo().getStorageList();
+        List<Storage> storage = getDeliveryInfo().getStorageList();
         List<String> stringList = new ArrayList<>();
         int index = 0;
         for (Product item : l) {
