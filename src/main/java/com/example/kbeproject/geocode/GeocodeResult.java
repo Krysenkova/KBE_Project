@@ -12,19 +12,9 @@ public class GeocodeResult {
     public GeocodeResult() {
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public List<GeocodeObject> getResults() {
         return results;
     }
 
-    public void setResults(List<GeocodeObject> results) {
-        this.results = results;
-    }
 }
