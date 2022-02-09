@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Getter @Setter
 @ToString
-public class Storage {
+public class StorageInfo {
     @Schema(description = "unique id")
     private UUID itemId;
     @Schema(description = "delivery time for particular product")
@@ -19,11 +19,11 @@ public class Storage {
     @Schema(description = "product location")
     private String location;
 
-    public Storage(){
+    public StorageInfo(){
 
     }
 
-    public Storage(UUID itemId, Long deliveryTime, Integer amount, String location) {
+    public StorageInfo(UUID itemId, Long deliveryTime, Integer amount, String location) {
         this.itemId = itemId;
         this.deliveryTime = deliveryTime;
         this.amount = amount;

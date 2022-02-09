@@ -1,9 +1,9 @@
 package com.example.kbeproject.product;
 
 import com.example.kbeproject.geocode.GeocodeResult;
-import com.example.kbeproject.models.DeliveryInfoList;
+import com.example.kbeproject.models.StorageInfoList;
 import com.example.kbeproject.models.Price;
-import com.example.kbeproject.models.Storage;
+import com.example.kbeproject.models.StorageInfo;
 import com.example.kbeproject.models.PriceList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
@@ -40,12 +40,12 @@ public class ProductService {
         return pricesList;
     }
 
-    public DeliveryInfoList getDeliveryInfo(){
-        return restTemplate.getForObject("http://localhost:8082/api/storage/all", DeliveryInfoList.class);
+    public StorageInfoList getDeliveryInfo(){
+        return restTemplate.getForObject("http://localhost:8082/api/storage/all", StorageInfoList.class);
     }
-    public Storage getDeliveryInfoById(Long productId) {
+    public StorageInfo getDeliveryInfoById(Long productId) {
         String url = "http://localhost:8082/api/storage/" + productId;
-        Storage info = restTemplate.getForObject(url, Storage.class);
+        StorageInfo info = restTemplate.getForObject(url, StorageInfo.class);
         return info;
     }
 
@@ -53,7 +53,7 @@ public class ProductService {
         restTemplate.getForObject("http://localhost:8082/api/storage/download", String.class);
     }
 
-    public String getFormattedAddress(Storage item) throws IOException{
+    public String getFormattedAddress(StorageInfo item) throws IOException{
         OkHttpClient client = new OkHttpClient();
         String encodedAddress = URLEncoder.encode(item.getLocation(), "UTF-8");
         Request request = new Request.Builder()

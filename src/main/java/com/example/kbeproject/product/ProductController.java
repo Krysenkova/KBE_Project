@@ -45,10 +45,10 @@ public class ProductController {
 
     @GetMapping("/delivery_info")
     @Operation(summary = "Get delivery info for all products from Storage Service")
-    public DeliveryInfoList getDeliveryInfo() throws IOException {
+    public StorageInfoList getDeliveryInfo() throws IOException {
         logger.info("Getting Info from Storage");
-        DeliveryInfoList list = productService.getDeliveryInfo();
-        for (Storage item : list.getStorageList()) {
+        StorageInfoList list = productService.getDeliveryInfo();
+        for (StorageInfo item : list.getStorageInfoList()) {
             item.setLocation(productService.getFormattedAddress(item));
         }
         return list;
@@ -56,11 +56,11 @@ public class ProductController {
 
     @GetMapping("/delivery_info/{id}")
     @Operation(summary = "Get delivery info for specific product from Storage Service")
-    public Storage getDeliveryInfoById(@PathVariable("id") Long productId) throws IOException {
+    public StorageInfo getDeliveryInfoById(@PathVariable("id") Long productId) throws IOException {
         logger.info("Getting Info from Storage for product with id " + productId);
-        Storage storage = productService.getDeliveryInfoById(productId);
-        storage.setLocation(productService.getFormattedAddress(storage));
-        return storage;
+        StorageInfo storageInfo = productService.getDeliveryInfoById(productId);
+        storageInfo.setLocation(productService.getFormattedAddress(storageInfo));
+        return storageInfo;
     }
 
     @GetMapping("/export")
@@ -73,22 +73,22 @@ public class ProductController {
             pricesWithoutMwSt.add(new Price(item.getItemId(), item.getPriceWithoutVat()));
         }
         List<Price> pricesWithMwSt = productService.getPriceWithMwSt(pricesWithoutMwSt).getPriceList();
-        List<Storage> storage = getDeliveryInfo().getStorageList();
-        List<String> stringList = prepareDataForCSV(products, pricesWithMwSt, storage);
+        List<StorageInfo> storageInfo = getDeliveryInfo().getStorageInfoList();
+        List<String> stringList = prepareDataForCSV(products, pricesWithMwSt, storageInfo);
         writeDataToCSV(stringList);
         uploadFileToSftpServer();
         productService.triggerDownload();
     }
 
-    private List<String> prepareDataForCSV(List<Product> products, List<Price> prices, List<Storage> storageList) {
+    private List<String> prepareDataForCSV(List<Product> products, List<Price> prices, List<StorageInfo> storageInfoList) {
         List<String> stringList = new ArrayList<>();
         int index = 0;
         for (Product item : products) {
-            for (Storage storage : storageList) {
-                if (item.getItemId().equals(storage.getItemId())) {
+            for (StorageInfo storageInfo : storageInfoList) {
+                if (item.getItemId().equals(storageInfo.getItemId())) {
                     ProductAllInfo allInfo = new ProductAllInfo(item.getItemId(), item.getName(), item.getDescription(), item.getMaterial(),
                             item.getColour(), item.getWeight(), item.getPriceWithoutVat(), prices.get(index).getPrice(),
-                            storage.getDeliveryTime(), storage.getAmount(), storage.getLocation());
+                            storageInfo.getDeliveryTime(), storageInfo.getAmount(), storageInfo.getLocation());
                     stringList.add(allInfo.toString());
                 }
             }
