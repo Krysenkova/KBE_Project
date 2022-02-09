@@ -1,5 +1,6 @@
 package com.example.kbeproject.models;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,8 +11,9 @@ import java.util.List;
 @Setter
 @ToString
 public class AllInfoList {
-    private List<ProductAllInfo> allInfoList;
 
+    @Schema(description = "all product information list")
+    private List<ProductAllInfo> allInfoList;
 
     public AllInfoList(List<ProductAllInfo> allInfoList) {
         this.allInfoList = allInfoList;

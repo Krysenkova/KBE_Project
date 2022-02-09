@@ -3,11 +3,13 @@ package com.example.kbeproject.product;
 import com.example.kbeproject.models.*;
 import com.example.kbeproject.utils.CsvWriter;
 import com.example.kbeproject.upload.FileTransferServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,18 +30,21 @@ public class ProductController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all products saved in DB")
     public List<Product> getProducts() {
         logger.info("Getting Products");
         return productService.getProducts();
     }
 
     @PostMapping("/prices")
-    public PriceList getPriceWithMwSt(@RequestBody List<Price> prices) {
+    @Operation(summary = "Get price with MwSt from Calculator Service")
+    public PriceList getPriceWithMwSt(@RequestBody @NotBlank List<Price> prices) {
         logger.info("Getting price with Mehrwertsteuerr");
         return productService.getPriceWithMwSt(prices);
     }
 
     @GetMapping("/delivery_info")
+    @Operation(summary = "Get delivery info for all products from Storage Service")
     public DeliveryInfoList getDeliveryInfo() throws IOException {
         logger.info("Getting Info from Storage");
         DeliveryInfoList list = productService.getDeliveryInfo();
@@ -50,6 +55,7 @@ public class ProductController {
     }
 
     @GetMapping("/delivery_info/{id}")
+    @Operation(summary = "Get delivery info for specific product from Storage Service")
     public Storage getDeliveryInfoById(@PathVariable("id") Long productId) throws IOException {
         logger.info("Getting Info from Storage for product with id " + productId);
         Storage storage = productService.getDeliveryInfoById(productId);
@@ -58,6 +64,7 @@ public class ProductController {
     }
 
     @GetMapping("/export")
+    @Operation(summary = "Export csv file with all products data")
     public void exportData() throws IOException {
         logger.info("Start exporting products info");
         List<Product> products = productService.getProducts();
