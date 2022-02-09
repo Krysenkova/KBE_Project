@@ -5,11 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 
 @Getter @Setter
 public class ProductAllInfo {
     @CsvBindByName
-    private Long itemId;
+    private UUID itemId;
     @CsvBindByName
     private String name;
     @CsvBindByName
@@ -36,7 +38,7 @@ public class ProductAllInfo {
     public ProductAllInfo() {
     }
 
-    public ProductAllInfo(Long itemId, String name, String description, String material, String colour, String weight,
+    public ProductAllInfo(UUID itemId, String name, String description, String material, String colour, String weight,
                           Double priceWithoutVat, Double priceWithVat, Long deliveryTime, Integer amount, String location) {
         this.itemId = itemId;
         this.name = name;

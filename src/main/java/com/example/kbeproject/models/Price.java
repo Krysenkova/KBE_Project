@@ -4,15 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 @Setter
 @Getter
 @ToString
 public class Price {
 
-    private long itemId;
+    private UUID itemId;
     private double price;
 
-    public Price(long itemId, double price) {
+    public Price(UUID itemId, double price) {
         this.itemId = itemId;
         this.price = price;
     }
