@@ -3,8 +3,10 @@ package com.example.kbeproject.product;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "product")
@@ -13,10 +15,11 @@ import javax.persistence.*;
 public class Product {
 
     @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     //sequence generator? do we need it?
-    //@GeneratedValue(generator = "uuid")
     @Column(name = "item_id")   //do not know if we really need column annotations
-    private Long itemId;
+    private UUID itemId;
     @Column(name = "name")
     private String name;
     @Column(name = "description")
@@ -36,8 +39,7 @@ public class Product {
     /**
      * constructor without id
      */
-    public Product(Long itemId, String name, String description, String material, String colour, String weight, Double priceWithoutVat) {
-        this.itemId = itemId;
+    public Product(String name, String description, String material, String colour, String weight, Double priceWithoutVat) {
         this.name = name;
         this.description = description;
         this.material = material;

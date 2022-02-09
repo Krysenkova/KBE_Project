@@ -73,15 +73,15 @@ public class ProductController {
         productService.triggerDownload();
     }
 
-    private List<String> prepareDataForCSV(List<Product> products, List<Price> prices, List<Storage> storage) {
+    private List<String> prepareDataForCSV(List<Product> products, List<Price> prices, List<Storage> storageList) {
         List<String> stringList = new ArrayList<>();
         int index = 0;
         for (Product item : products) {
-            for (Storage s : storage) {
-                if (item.getItemId().equals(s.getItemId())) {
+            for (Storage storage : storageList) {
+                if (item.getItemId().equals(storage.getItemId())) {
                     ProductAllInfo allInfo = new ProductAllInfo(item.getItemId(), item.getName(), item.getDescription(), item.getMaterial(),
                             item.getColour(), item.getWeight(), item.getPriceWithoutVat(), prices.get(index).getPrice(),
-                            s.getDeliveryTime(), s.getAmount(), s.getLocation());
+                            storage.getDeliveryTime(), storage.getAmount(), storage.getLocation());
                     stringList.add(allInfo.toString());
                 }
             }

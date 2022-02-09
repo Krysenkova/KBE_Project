@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 @Getter @Setter
 @ToString
 public class Storage {
 
-    private Long itemId;
+    private UUID itemId;
     private Long deliveryTime;
     private Integer amount;
     private String location;
@@ -17,7 +19,7 @@ public class Storage {
 
     }
 
-    public Storage(Long itemId, Long deliveryTime, Integer amount, String location) {
+    public Storage(UUID itemId, Long deliveryTime, Integer amount, String location) {
         this.itemId = itemId;
         this.deliveryTime = deliveryTime;
         this.amount = amount;
