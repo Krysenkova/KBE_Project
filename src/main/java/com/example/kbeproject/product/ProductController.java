@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
@@ -50,10 +49,7 @@ public class ProductController {
     public StorageInfoList getDeliveryInfo() throws IOException {
         logger.info("Getting Info from Storage");
         StorageInfoList list = productService.getDeliveryInfo();
-        for (StorageInfo item : list.getStorageInfoList()) {
-            item.setLocation("productService.getFormattedAddress(item)");
-        }
-        return list;
+        return getFormattedAddress(list);
     }
 
     @GetMapping("/delivery_info/{id}")
@@ -61,7 +57,9 @@ public class ProductController {
     public StorageInfo getDeliveryInfoById(@PathVariable("id") Long productId) throws IOException {
         logger.info("Getting Info from Storage for product with id " + productId);
         StorageInfo storageInfo = productService.getDeliveryInfoById(productId);
-        storageInfo.setLocation(productService.getFormattedAddress(storageInfo));
+        List<StorageInfo> list = new ArrayList<>();
+        list.add(storageInfo);
+        getFormattedAddress(new StorageInfoList(list));
         return storageInfo;
     }
 
@@ -111,5 +109,13 @@ public class ProductController {
             logger.info("File is uploaded to sftp server successfully");
         }
         else logger.error("The problem occurred while uploading file to sftp server");
+    }
+
+    private StorageInfoList getFormattedAddress(StorageInfoList list) {
+        logger.info("Getting formatted addresses for storage info");
+        for (StorageInfo item : list.getStorageInfoList()) {
+            item.setLocation("productService.getFormattedAddress(item)");
+        }
+        return list;
     }
 }
