@@ -49,7 +49,7 @@ public class ProductController {
         logger.info("Getting Info from Storage");
         StorageInfoList list = productService.getDeliveryInfo();
         for (StorageInfo item : list.getStorageInfoList()) {
-            item.setLocation(productService.getFormattedAddress(item));
+            item.setLocation("productService.getFormattedAddress(item)");
         }
         return list;
     }
