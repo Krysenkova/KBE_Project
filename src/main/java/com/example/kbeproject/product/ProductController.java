@@ -1,17 +1,20 @@
 package com.example.kbeproject.product;
 
 import com.example.kbeproject.models.*;
+import com.example.kbeproject.utils.CsvWriter;
+import com.example.kbeproject.upload.FileTransferServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
-import org.supercsv.io.CsvBeanWriter;
-import org.supercsv.io.ICsvBeanWriter;
-import org.supercsv.prefs.CsvPreference;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -20,67 +23,93 @@ public class ProductController {
     Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     private final ProductService productService;
+    private final FileTransferServiceImpl transfer;
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, FileTransferServiceImpl transfer) {
         this.productService = productService;
+        this.transfer = transfer;
     }
 
     @GetMapping
+    @Operation(summary = "Get all products saved in DB")
     public List<Product> getProducts() {
-        logger.trace("Getting Products in ProductController");
+        logger.info("Getting Products");
         return productService.getProducts();
     }
 
-    @PostMapping("/list")
-    public ResponseList sendProducts(@RequestBody List<Product> products) {
-        return productService.sendProducts(products);
+    @PostMapping("/prices")
+    @Operation(summary = "Get price with MwSt from Calculator Service")
+    public PriceList getPriceWithMwSt(@RequestBody @NotBlank List<Price> prices) {
+        logger.info("Getting price with Mehrwertsteuerr");
+        return productService.getPriceWithMwSt(prices);
     }
 
-
     @GetMapping("/delivery_info")
-    public DeliveryInfoList getDeliveryInfo() {
-        return productService.getDeliveryInfo();
+    @Operation(summary = "Get delivery info for all products from Storage Service")
+    public StorageInfoList getDeliveryInfo() throws IOException {
+        logger.info("Getting Info from Storage");
+        StorageInfoList list = productService.getDeliveryInfo();
+        for (StorageInfo item : list.getStorageInfoList()) {
+            item.setLocation("productService.getFormattedAddress(item)");
+        }
+        return list;
     }
 
     @GetMapping("/delivery_info/{id}")
-    public Storage getDeliveryInfoById(@PathVariable("id") Long productId) {
-        return productService.getDeliveryInfoById(productId);
+    @Operation(summary = "Get delivery info for specific product from Storage Service")
+    public StorageInfo getDeliveryInfoById(@PathVariable("id") Long productId) throws IOException {
+        logger.info("Getting Info from Storage for product with id " + productId);
+        StorageInfo storageInfo = productService.getDeliveryInfoById(productId);
+        storageInfo.setLocation(productService.getFormattedAddress(storageInfo));
+        return storageInfo;
     }
 
     @GetMapping("/export")
-    public void exportToCSV(HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv");
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=info.csv";
-        response.setHeader(headerKey, headerValue);
-        List<Product> l = productService.getProducts();
-        ResponseList rl = productService.sendProducts(l);
-        DeliveryInfoList dil = productService.getDeliveryInfo();
-        AllInfoList allInfo = new AllInfoList();
-        for (Product item : rl.getProductList()) {
-            for (Storage stor : dil.getStorageList()) {
-                if (item.getItemId().equals(stor.getItemId())) {
-                    ProductAllInfo p = new ProductAllInfo(item.getItemId(), item.getName(), item.getDescription(), item.getMaterial(),
-                            item.getColour(), item.getWeight(), item.getPriceWithoutVat(), item.getPriceWithVat(),
-                            stor.getDeliveryTime(), stor.getAmount(), stor.getLocation());
-                    allInfo.getAllInfoList().add(p);
+    @Operation(summary = "Export csv file with all products data")
+    public void exportData() throws IOException {
+        logger.info("Start exporting products info");
+        List<Product> products = productService.getProducts();
+        List<Price> pricesWithoutMwSt = new ArrayList<>();
+        for (Product item : products) {
+            pricesWithoutMwSt.add(new Price(item.getItemId(), item.getPriceWithoutVat()));
+        }
+        List<Price> pricesWithMwSt = productService.getPriceWithMwSt(pricesWithoutMwSt).getPriceList();
+        List<StorageInfo> storageInfo = getDeliveryInfo().getStorageInfoList();
+        List<String> stringList = prepareDataForCSV(products, pricesWithMwSt, storageInfo);
+        writeDataToCSV(stringList);
+        uploadFileToSftpServer();
+        productService.triggerDownload();
+    }
+
+    private List<String> prepareDataForCSV(List<Product> products, List<Price> prices, List<StorageInfo> storageInfoList) {
+        List<String> stringList = new ArrayList<>();
+        int index = 0;
+        for (Product item : products) {
+            for (StorageInfo storageInfo : storageInfoList) {
+                if (item.getItemId().equals(storageInfo.getItemId())) {
+                    ProductAllInfo allInfo = new ProductAllInfo(item.getItemId(), item.getName(), item.getDescription(), item.getMaterial(),
+                            item.getColour(), item.getWeight(), item.getPriceWithoutVat(), prices.get(index).getPrice(),
+                            storageInfo.getDeliveryTime(), storageInfo.getAmount(), storageInfo.getLocation());
+                    stringList.add(allInfo.toString());
                 }
             }
-
+            index++;
         }
+        logger.info("Data is prepared to be written to CSV file");
+        return stringList;
+    }
 
-        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
-        String[] csvHeader = {"Product ID", "Name", "Description", "Material", "Colour", "Weight", "Price Without VAT",
-                                "Price with VAT", "Delivery Time", "Amount", "Location"};
-       /* String[] nameMapping = {"item_id", "name", "description", "material", "colour", "weight", "price_without_vat",
-                                "price_with_vat", "delivery_time", "amount", "product_location"};*/
+    private void writeDataToCSV(@NotEmpty List<String> stringList) throws IOException {
+        logger.info("Writing data to CSV file");
+        CsvWriter writer = new CsvWriter();
+        writer.writeToCsvFile(stringList, new File("all_info.csv"));
+    }
 
-        csvWriter.writeHeader(csvHeader);
-
-        for (ProductAllInfo prod : allInfo.getAllInfoList()) {
-            csvWriter.write(prod);
+    private void uploadFileToSftpServer() {
+        if (transfer.uploadFile("all_info.csv", "all_info.csv")) {
+            logger.info("File is uploaded to sftp server successfully");
         }
-        csvWriter.close();
+        else logger.error("The problem occurred while uploading file to sftp server");
     }
 }

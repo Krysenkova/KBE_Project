@@ -1,16 +1,22 @@
 package com.example.kbeproject.product;
 
-import com.example.kbeproject.models.DeliveryInfoList;
-import com.example.kbeproject.models.Storage;
-import com.example.kbeproject.models.ResponseList;
+import com.example.kbeproject.geocode.GeocodeResult;
+import com.example.kbeproject.models.StorageInfoList;
+import com.example.kbeproject.models.Price;
+import com.example.kbeproject.models.StorageInfo;
+import com.example.kbeproject.models.PriceList;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.ResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 
 @Component
@@ -32,18 +38,37 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public ResponseList sendProducts(List<Product> products) {
-        ResponseList productList = restTemplate.postForObject("http://localhost:8081/api/vat",
-                products, ResponseList.class);
-        return productList;
+    public PriceList getPriceWithMwSt(List<Price> prices) {
+        PriceList pricesList = restTemplate.postForObject("http://localhost:8081/api/mwst",
+                prices, PriceList.class);
+        return pricesList;
     }
 
-    public DeliveryInfoList getDeliveryInfo(){
-        return restTemplate.getForObject("http://localhost:8082/api/storage/all", DeliveryInfoList.class);
+    public StorageInfoList getDeliveryInfo(){
+        return restTemplate.getForObject("http://localhost:8082/api/storage/all", StorageInfoList.class);
     }
-    public Storage getDeliveryInfoById(Long productId) {
+    public StorageInfo getDeliveryInfoById(Long productId) {
         String url = "http://localhost:8082/api/storage/" + productId;
-        Storage info = restTemplate.getForObject(url, Storage.class);
+        StorageInfo info = restTemplate.getForObject(url, StorageInfo.class);
         return info;
+    }
+
+    public void triggerDownload() {
+        restTemplate.getForObject("http://localhost:8082/api/storage/download", String.class);
+    }
+
+    public String getFormattedAddress(StorageInfo item) throws IOException{
+        OkHttpClient client = new OkHttpClient();
+        String encodedAddress = URLEncoder.encode(item.getLocation(), "UTF-8");
+        Request request = new Request.Builder()
+                .url("https://google-maps-geocoding.p.rapidapi.com/geocode/json?language=en&address=" + encodedAddress)
+                .get()
+                .addHeader("x-rapidapi-host", "google-maps-geocoding.p.rapidapi.com")
+                .addHeader("x-rapidapi-key", "1ae759c287msh779edf5552fed3bp1347bajsn63a12ee2cfe9"/*  Use your API Key here */)
+                .build();
+        ResponseBody responseBody = client.newCall(request).execute().body();
+        ObjectMapper objectMapper = new ObjectMapper();
+        GeocodeResult result = objectMapper.readValue(responseBody.string(), GeocodeResult.class);
+        return result.getResults().get(0).getFormattedAddress();
     }
 }
