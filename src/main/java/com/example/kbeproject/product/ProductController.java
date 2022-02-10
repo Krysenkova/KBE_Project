@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -98,7 +99,7 @@ public class ProductController {
         return stringList;
     }
 
-    private void writeDataToCSV(List<String> stringList) throws IOException {
+    private void writeDataToCSV(@NotEmpty List<String> stringList) throws IOException {
         logger.info("Writing data to CSV file");
         CsvWriter writer = new CsvWriter();
         writer.writeToCsvFile(stringList, new File("all_info.csv"));
